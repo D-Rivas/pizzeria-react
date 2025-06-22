@@ -3,8 +3,8 @@ import { formatCurrency } from '../utils/format';
 
 export default function CardPizza({ name, price, ingredients, img }) {
   return (
-    <div className="col-12 col-sm-6 col-md-4">
-      <div className="card h-100">
+    <div className="col-12 col-sm-6 col-md-4 mb-4">
+      <div className="card h-100 shadow rounded-4">
         <img src={img} className="card-img-top" alt={name} />
         <div className="card-body d-flex flex-column">
           <h5 className="card-title">Pizza {name}</h5>

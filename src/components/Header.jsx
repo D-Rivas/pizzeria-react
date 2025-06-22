@@ -7,6 +7,8 @@ export default function Header() {
       className="text-center text-white"
       style={{
         backgroundImage: `url(${bgImage})`,
+        backgroundColor: 'rgba(0,0,0,0.5)',      
+        backgroundBlendMode: 'darken',   
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         padding: '6rem 1rem 4rem',
