@@ -1,50 +1,27 @@
-import React from 'react';
-import { formatCurrency } from '../utils/format';
-
-export default function Navbar() {
-  const token = false;
+export default function Navbar({ setPage }) {
+  const token = false; // Cambia para simular usuario logueado
   const total = 25000;
 
   return (
-    <nav className="navbar navbar-dark bg-dark navbar-expand-lg py-2">
-      <div className="container">
-        <span className="navbar-brand mb-0 h1">Pizzería Mamma Mia!</span>
-
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarContent"
-          aria-controls="navbarContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon" />
-        </button>
-
-        <div className="collapse navbar-collapse" id="navbarContent">
-          <div className="navbar-nav me-auto">
-            <button className="btn btn-outline-light btn-sm me-2">🍕 Home</button>
-            {token ? (
-              <>
-                <button className="btn btn-outline-light btn-sm me-2">🔓 Profile</button>
-                <button className="btn btn-outline-light btn-sm me-2">🔒 Logout</button>
-              </>
-            ) : (
-              <>
-                <button className="btn btn-outline-light btn-sm me-2">🔐 Login</button>
-                <button className="btn btn-outline-light btn-sm me-2">🔐 Register</button>
-              </>
-            )}
-          </div>
-
-          <div className="d-flex">
-            <button className="btn btn-info btn-sm">
-              🛒 Total: ${formatCurrency(total)}
-            </button>
-          </div>
-        </div>
+    <nav className="navbar navbar-dark bg-dark px-3 w-100" style={{ width: "100vw", margin: 0, borderRadius: 0 }}>
+      <span className="navbar-brand">Pizzería Mamma Mia!</span>
+      <div className="d-flex align-items-center">
+        <button className="btn btn-warning me-2" onClick={() => setPage('home')}>🍕 Inicio</button>
+        {token ? (
+          <>
+            <button className="btn btn-warning me-2" onClick={() => setPage('profile')}>🔓 Profile</button>
+            <button className="btn btn-warning" onClick={() => setPage('logout')}>🔒 logout</button>
+          </>
+        ) : (
+          <>
+            <button className="btn btn-warning me-2" onClick={() => setPage('login')}>🔐 Login</button>
+            <button className="btn btn-warning" onClick={() => setPage('register')}>🔐 Register</button>
+          </>
+        )}
       </div>
+      <button className="btn btn-info ms-auto">
+        🛒 Total: ${total.toLocaleString('es-CL')}
+      </button>
     </nav>
   );
 }
