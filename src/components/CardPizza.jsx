@@ -1,30 +1,16 @@
-import React from 'react';
-import { formatCurrency } from '../utils/format';
+import React from "react";
 
 export default function CardPizza({ name, price, ingredients, img }) {
   return (
-    <div className="col-12 col-sm-6 col-md-4 mb-4">
-      <div className="card h-100 shadow rounded-4">
-        <img src={img} className="card-img-top" alt={name} />
-        <div className="card-body d-flex flex-column">
-          <h5 className="card-title">Pizza {name}</h5>
-
-          <h6>Ingredientes:</h6>
-          <ul className="flex-grow-1">
-            {ingredients.map((ing, i) => (
-              <li key={i}>{ing}</li>
-            ))}
-          </ul>
-
-          <p className="mt-3 mb-2">
-            <strong>Precio: ${formatCurrency(price)}</strong>
-          </p>
-
-          <div className="mt-auto d-flex">
-            <button className="btn btn-outline-secondary me-2">Ver Más</button>
-            <button className="btn btn-primary">Añadir</button>
-          </div>
-        </div>
+    <div className="card col-md-4 m-3 p-0" style={{ maxWidth: 320 }}>
+      <img src={img} className="card-img-top" alt={name} style={{ height: 170, objectFit: "cover" }} />
+      <div className="card-body">
+        <h5 className="card-title">{name}</h5>
+        <p className="card-text mb-1"><strong>Ingredientes:</strong></p>
+        <ul>
+          {ingredients.map((ing, i) => <li key={i}>{ing}</li>)}
+        </ul>
+        <p><strong>Precio:</strong> ${price.toLocaleString("es-CL")}</p>
       </div>
     </div>
   );
