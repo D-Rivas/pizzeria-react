@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { pizzaCart } from '../data/pizzas';
+import React, { useState } from "react";
+import { pizzaCart } from "../data/pizzas";
 
 export default function Cart() {
-  const [cart, setCart] = useState(pizzaCart);
+  const [cart, setCart] = useState([...pizzaCart]);
 
+  
   const updateQuantity = (id, delta) => {
     setCart(cart =>
       cart
@@ -16,37 +17,90 @@ export default function Cart() {
     );
   };
 
-   const total = cart.reduce((sum, pizza) => sum + pizza.price * pizza.quantity, 0);
-   
+ 
+  const total = cart.reduce(
+    (sum, pizza) => sum + pizza.price * pizza.quantity,
+    0
+  );
+
   return (
-    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "87vh" }}>
-      <div className="cart-container w-100" style={{
-        maxWidth: 420,
-        background: '#fff',
-        borderRadius: 16,
-        padding: 24,
-        boxShadow: '0 2px 20px #eee'
-      }}>
-        <h4 className="mb-4">Detalles del pedido:</h4>
-        {cart.map(pizza => (
-          <div key={pizza.id} className="d-flex align-items-center mb-3">
-            <img src={pizza.img} alt={pizza.name} width={60} height={60} className="rounded me-2" />
-            <div className="flex-grow-1">
-              <div className="fw-semibold">{pizza.name}</div>
-              <span className="text-muted">${pizza.price.toLocaleString('es-CL')}</span>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "80vh",
+      }}
+    >
+      <div
+        style={{
+          background: "#fff",
+          padding: 32,
+          borderRadius: 20,
+          minWidth: 350,
+          boxShadow: "0 4px 24px #0002",
+        }}
+      >
+        <h2>Detalles del pedido:</h2>
+        {cart.map((pizza) => (
+          <div key={pizza.id} style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
+            <img src={pizza.img} alt={pizza.name} width={60} style={{ marginRight: 12, borderRadius: 8 }} />
+            <div style={{ flex: 1 }}>
+              <strong>{pizza.name}</strong> <span> ${pizza.price.toLocaleString("es-CL")}</span>
             </div>
-            <div className="d-flex align-items-center ms-3">
-              <button className="btn btn-outline-danger btn-sm px-2 me-1" onClick={() => updateQuantity(pizza.id, -1)}>-</button>
-              <span style={{ width: 24, display: 'inline-block', textAlign: 'center' }}>{pizza.quantity}</span>
-              <button className="btn btn-outline-primary btn-sm px-2 ms-1" onClick={() => updateQuantity(pizza.id, 1)}>+</button>
-            </div>
+            <button
+              onClick={() => updateQuantity(pizza.id, -1)}
+              style={{
+                border: "1.5px solid #e00",
+                color: "#e00",
+                background: "none",
+                borderRadius: 5,
+                margin: "0 3px",
+                width: 30,
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
+            >
+              -
+            </button>
+            <span style={{ minWidth: 18, textAlign: "center" }}>{pizza.quantity}</span>
+            <button
+              onClick={() => updateQuantity(pizza.id, 1)}
+              style={{
+                border: "1.5px solid #339af0",
+                color: "#339af0",
+                background: "none",
+                borderRadius: 5,
+                margin: "0 3px",
+                width: 30,
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
+            >
+              +
+            </button>
           </div>
         ))}
         <hr />
-        <h5>
-          Total: <span className="text-success">${total.toLocaleString('es-CL')}</span>
-        </h5>
-        <button className="btn btn-success w-100 mt-3 py-2 fw-bold">Pagar</button>
+        <h3>
+          Total: <span style={{ color: "#218838" }}>${total.toLocaleString("es-CL")}</span>
+        </h3>
+        <button
+          style={{
+            width: "100%",
+            padding: 10,
+            background: "#218838",
+            color: "#fff",
+            border: "none",
+            fontWeight: "bold",
+            borderRadius: 8,
+            marginTop: 8,
+            fontSize: 18,
+            cursor: "pointer",
+          }}
+        >
+          Pagar
+        </button>
       </div>
     </div>
   );
