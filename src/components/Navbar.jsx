@@ -1,27 +1,18 @@
-export default function Navbar() {
-  const token = false; // Cambia para simular usuario logueado
-  const total = 25000;
+import { Link } from "react-router-dom";
 
+export default function Navbar() {
   return (
-    <nav className="navbar navbar-dark bg-dark px-3 w-100" style={{ width: "100vw", margin: 0, borderRadius: 0 }}>
+    <nav className="navbar navbar-dark bg-dark px-3">
       <span className="navbar-brand">Pizzería Mamma Mia!</span>
-      <div className="d-flex align-items-center">
-        <button className="btn btn-warning me-2">🍕 Inicio</button>
-        {token ? (
-          <>
-            <button className="btn btn-warning me-2">🔓 Profile</button>
-            <button className="btn btn-warning">🔒 logout</button>
-          </>
-        ) : (
-          <>
-            <button className="btn btn-warning me-2">🔐 Login</button>
-            <button className="btn btn-warning">🔐 Register</button>
-          </>
-        )}
+      <div className="d-flex gap-2">
+        <Link to="/" className="btn btn-warning">🍕 Home</Link>
+        <Link to="/login" className="btn btn-warning">🔒 Login</Link>
+        <Link to="/register" className="btn btn-warning">🔒 Sign up</Link>
+        <Link to="/cart" className="btn btn-info">🛒 Total: $25.000</Link>
       </div>
-      <button className="btn btn-info ms-auto">
-        🛒 Total: ${total.toLocaleString('es-CL')}
-      </button>
     </nav>
   );
 }
+
+
+ 
