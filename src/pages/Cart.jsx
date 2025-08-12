@@ -1,106 +1,46 @@
-import React, { useState } from "react";
-import { pizzaCart } from "../data/pizzas";
+import { useCart } from "../context/CartContext";
 
 export default function Cart() {
-  const [cart, setCart] = useState([...pizzaCart]);
+  const { cart, changeQty, removeFromCart, clearCart, total } = useCart();
 
-  
-  const updateQuantity = (id, delta) => {
-    setCart(cart =>
-      cart
-        .map(pizza =>
-          pizza.id === id
-            ? { ...pizza, quantity: Math.max(0, pizza.quantity + delta) }
-            : pizza
-        )
-        .filter(pizza => pizza.quantity > 0)
+  if (!cart.length) {
+    return (
+      <div className="container my-5 text-center">
+        <h3>Tu carrito está vacío 🛒</h3>
+      </div>
     );
-  };
-
- 
-  const total = cart.reduce(
-    (sum, pizza) => sum + pizza.price * pizza.quantity,
-    0
-  );
+  }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "80vh",
-      }}
-    >
-      <div
-        style={{
-          background: "#fff",
-          padding: 32,
-          borderRadius: 20,
-          minWidth: 350,
-          boxShadow: "0 4px 24px #0002",
-        }}
-      >
-        <h2>Detalles del pedido:</h2>
-        {cart.map((pizza) => (
-          <div key={pizza.id} style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
-            <img src={pizza.img} alt={pizza.name} width={60} style={{ marginRight: 12, borderRadius: 8 }} />
-            <div style={{ flex: 1 }}>
-              <strong>{pizza.name}</strong> <span> ${pizza.price.toLocaleString("es-CL")}</span>
+    <div className="container my-5" style={{ maxWidth: 800 }}>
+      <h4 className="mb-4">Detalles del pedido</h4>
+
+      {cart.map((p) => (
+        <div key={p.id} className="d-flex align-items-center justify-content-between border rounded p-2 mb-2">
+          <div className="d-flex align-items-center" style={{ gap: 12 }}>
+            <img src={p.img} alt={p.name} width={60} height={60} style={{ objectFit: "cover", borderRadius: 8 }} />
+            <div>
+              <strong>{p.name}</strong>
+              <div>${p.price.toLocaleString("es-CL")} c/u</div>
             </div>
-            <button
-              onClick={() => updateQuantity(pizza.id, -1)}
-              style={{
-                border: "1.5px solid #e00",
-                color: "#e00",
-                background: "none",
-                borderRadius: 5,
-                margin: "0 3px",
-                width: 30,
-                fontWeight: "bold",
-                cursor: "pointer",
-              }}
-            >
-              -
-            </button>
-            <span style={{ minWidth: 18, textAlign: "center" }}>{pizza.quantity}</span>
-            <button
-              onClick={() => updateQuantity(pizza.id, 1)}
-              style={{
-                border: "1.5px solid #339af0",
-                color: "#339af0",
-                background: "none",
-                borderRadius: 5,
-                margin: "0 3px",
-                width: 30,
-                fontWeight: "bold",
-                cursor: "pointer",
-              }}
-            >
-              +
-            </button>
           </div>
-        ))}
-        <hr />
-        <h3>
-          Total: <span style={{ color: "#218838" }}>${total.toLocaleString("es-CL")}</span>
-        </h3>
-        <button
-          style={{
-            width: "100%",
-            padding: 10,
-            background: "#218838",
-            color: "#fff",
-            border: "none",
-            fontWeight: "bold",
-            borderRadius: 8,
-            marginTop: 8,
-            fontSize: 18,
-            cursor: "pointer",
-          }}
-        >
-          Pagar
-        </button>
+
+          <div className="d-flex align-items-center" style={{ gap: 8 }}>
+            <button className="btn btn-outline-danger btn-sm" onClick={() => changeQty(p.id, -1)}>-</button>
+            <span style={{ minWidth: 24, textAlign: "center" }}>{p.quantity}</span>
+            <button className="btn btn-outline-primary btn-sm" onClick={() => changeQty(p.id, 1)}>+</button>
+            <button className="btn btn-outline-secondary btn-sm" onClick={() => removeFromCart(p.id)}>Eliminar</button>
+          </div>
+        </div>
+      ))}
+
+      <hr />
+      <div className="d-flex justify-content-between align-items-center">
+        <h4>Total: <span className="text-success">${total.toLocaleString("es-CL")}</span></h4>
+        <div className="d-flex gap-2">
+          <button className="btn btn-outline-secondary" onClick={clearCart}>Vaciar</button>
+          <button className="btn btn-success">Pagar</button>
+        </div>
       </div>
     </div>
   );
