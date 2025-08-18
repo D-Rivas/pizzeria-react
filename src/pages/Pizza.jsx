@@ -5,52 +5,54 @@ export default function Pizza() {
   const { id } = useParams();
   const [pizza, setPizza] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const obtenerPizza = async () => {
-      try {
-        const respuesta = await fetch(`http://localhost:5000/api/pizzas/${id}`);
-        if (!respuesta.ok) throw new Error("Pizza no encontrada");
-        const data = await respuesta.json();
-        setPizza(data);
-      } catch (error) {
-        console.error("Error al cargar pizza:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    let abort = false;
 
-    obtenerPizza();
+    (async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const res = await fetch(`http://localhost:5000/api/pizzas/${id}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const ct = res.headers.get("content-type") || "";
+        if (!ct.includes("application/json")) {
+          const txt = await res.text();
+          throw new Error(`Respuesta no-JSON (${ct}). ${txt.slice(0,80)}…`);
+        }
+        const data = await res.json();
+        if (!abort) setPizza(data);
+      } catch (e) {
+        if (!abort) setError(e.message || "Error desconocido");
+      } finally {
+        if (!abort) setLoading(false);
+      }
+    })();
+
+    return () => { abort = true; };
   }, [id]);
 
-  if (loading) return <p className="text-center mt-5">Cargando pizza...</p>;
-
-  if (!pizza)
-    return <p className="text-center mt-5 text-danger">Pizza no encontrada</p>;
+  if (loading) return <p className="m-3">Cargando...</p>;
+  if (error)   return <p className="m-3 text-danger">Error: {error}</p>;
+  if (!pizza)  return <p className="m-3">No se encontró la pizza.</p>;
 
   return (
-    <main className="container my-5">
-      <div className="card mx-auto" style={{ maxWidth: 500 }}>
-        <img
-          src={pizza.img}
-          className="card-img-top"
-          alt={pizza.name}
-          style={{ height: 250, objectFit: "cover" }}
-        />
-        <div className="card-body">
-          <h3 className="card-title">{pizza.name}</h3>
-          <p className="card-text">{pizza.desc}</p>
-          <h5>Ingredientes:</h5>
-          <ul>
-            {pizza.ingredients.map((ing, i) => (
-              <li key={i}>{ing}</li>
-            ))}
-          </ul>
-          <h4 className="mt-3 text-success">
-            Precio: ${pizza.price.toLocaleString("es-CL")}
-          </h4>
+    <article className="container py-3">
+      <div className="row">
+        <div className="col-md-5">
+          <img src={pizza.img} alt={pizza.name} className="img-fluid rounded" loading="lazy" />
+        </div>
+        <div className="col-md-7">
+          <h1 className="mb-2 text-capitalize">{pizza.name}</h1>
+          <p className="text-muted">{pizza.desc}</p>
+          <h5 className="mt-3">Ingredientes:</h5>
+          {pizza.ingredients?.length ? (
+            <ul>{pizza.ingredients.map((ing, i) => <li key={i}>{ing}</li>)}</ul>
+          ) : <p className="text-muted">Sin ingredientes listados.</p>}
+          <p className="fs-5 mt-3"><strong>Precio:</strong> ${Number(pizza.price).toLocaleString("es-CL")}</p>
         </div>
       </div>
-    </main>
+    </article>
   );
 }

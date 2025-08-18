@@ -1,47 +1,73 @@
-import { useCart } from "../context/CartContext";
+import { useUser } from "../context/UserContext.jsx";
+import { useCart } from "../context/CartContext.jsx";
 
 export default function Cart() {
-  const { cart, changeQty, removeFromCart, clearCart, total } = useCart();
-
-  if (!cart.length) {
-    return (
-      <div className="container my-5 text-center">
-        <h3>Tu carrito está vacío 🛒</h3>
-      </div>
-    );
-  }
+  const { token } = useUser();
+  const { cart, inc, dec, removeFromCart, clearCart, cartTotal } = useCart();
 
   return (
-    <div className="container my-5" style={{ maxWidth: 800 }}>
-      <h4 className="mb-4">Detalles del pedido</h4>
+    <section className="container py-4">
+      <h2 className="mb-3">Carrito</h2>
 
-      {cart.map((p) => (
-        <div key={p.id} className="d-flex align-items-center justify-content-between border rounded p-2 mb-2">
-          <div className="d-flex align-items-center" style={{ gap: 12 }}>
-            <img src={p.img} alt={p.name} width={60} height={60} style={{ objectFit: "cover", borderRadius: 8 }} />
-            <div>
-              <strong>{p.name}</strong>
-              <div>${p.price.toLocaleString("es-CL")} c/u</div>
-            </div>
-          </div>
-
-          <div className="d-flex align-items-center" style={{ gap: 8 }}>
-            <button className="btn btn-outline-danger btn-sm" onClick={() => changeQty(p.id, -1)}>-</button>
-            <span style={{ minWidth: 24, textAlign: "center" }}>{p.quantity}</span>
-            <button className="btn btn-outline-primary btn-sm" onClick={() => changeQty(p.id, 1)}>+</button>
-            <button className="btn btn-outline-secondary btn-sm" onClick={() => removeFromCart(p.id)}>Eliminar</button>
-          </div>
+      {cart.length === 0 ? (
+        <p className="text-muted">Tu carrito está vacío.</p>
+      ) : (
+        <div className="table-responsive">
+          <table className="table align-middle">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th style={{width: 120}}>Cantidad</th>
+                <th>Precio</th>
+                <th>Subtotal</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {cart.map((p) => (
+                <tr key={p.id}>
+                  <td className="d-flex align-items-center gap-2">
+                    <img src={p.img} alt={p.name} width={56} height={40} style={{objectFit: "cover"}}/>
+                    <span className="text-capitalize">{p.name}</span>
+                  </td>
+                  <td>
+                    <div className="btn-group">
+                      <button className="btn btn-outline-secondary" onClick={() => dec(p.id)}>-</button>
+                      <span className="btn btn-light">{p.qty ?? 1}</span>
+                      <button className="btn btn-outline-secondary" onClick={() => inc(p.id)}>+</button>
+                    </div>
+                  </td>
+                  <td>${Number(p.price).toLocaleString("es-CL")}</td>
+                  <td>${(Number(p.price) * (p.qty ?? 1)).toLocaleString("es-CL")}</td>
+                  <td>
+                    <button className="btn btn-sm btn-outline-danger" onClick={() => removeFromCart(p.id)}>
+                      Quitar
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colSpan={3} className="text-end fw-bold">Total:</td>
+                <td className="fw-bold">${cartTotal.toLocaleString("es-CL")}</td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
         </div>
-      ))}
+      )}
 
-      <hr />
-      <div className="d-flex justify-content-between align-items-center">
-        <h4>Total: <span className="text-success">${total.toLocaleString("es-CL")}</span></h4>
-        <div className="d-flex gap-2">
-          <button className="btn btn-outline-secondary" onClick={clearCart}>Vaciar</button>
-          <button className="btn btn-success">Pagar</button>
-        </div>
+      <div className="d-flex gap-2 mt-3">
+        <button className="btn btn-outline-secondary" onClick={clearCart} disabled={cart.length === 0}>
+          Vaciar
+        </button>
+        <button className="btn btn-success" disabled={!token || cart.length === 0}
+          title={!token ? "Debes iniciar sesión para pagar" : "Pagar ahora"}>
+          Pagar
+        </button>
       </div>
-    </div>
+      {!token && <p className="text-danger mt-2">Debes iniciar sesión para pagar.</p>}
+    </section>
   );
 }

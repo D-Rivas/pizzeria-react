@@ -1,11 +1,8 @@
-import { createContext, useContext, useMemo, useState, useEffect } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-const CartContext = createContext();
-
-export const useCart = () => useContext(CartContext);
+const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
- 
   const [cart, setCart] = useState(() => {
     try {
       const raw = localStorage.getItem("cart");
@@ -19,47 +16,56 @@ export function CartProvider({ children }) {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
-  const addToCart = (pizza) => {
+  const addToCart = (item) => {
     setCart((prev) => {
-      const found = prev.find((p) => p.id === pizza.id);
+      const found = prev.find((p) => p.id === item.id);
       if (found) {
         return prev.map((p) =>
-          p.id === pizza.id ? { ...p, quantity: p.quantity + 1 } : p
+          p.id === item.id ? { ...p, qty: (p.qty ?? 1) + 1 } : p
         );
       }
-      return [...prev, { ...pizza, quantity: 1 }];
+      return [...prev, { ...item, qty: 1 }];
     });
   };
 
-  const changeQty = (id, delta) => {
+  const inc = (id) =>
+    setCart((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, qty: (p.qty ?? 1) + 1 } : p))
+    );
+
+  const dec = (id) =>
     setCart((prev) =>
       prev
-        .map((p) => (p.id === id ? { ...p, quantity: Math.max(0, p.quantity + delta) } : p))
-        .filter((p) => p.quantity > 0)
+        .map((p) =>
+          p.id === id ? { ...p, qty: Math.max((p.qty ?? 1) - 1, 0) } : p
+        )
+        .filter((p) => (p.qty ?? 0) > 0)
     );
-  };
 
-  const removeFromCart = (id) => {
+  const removeFromCart = (id) =>
     setCart((prev) => prev.filter((p) => p.id !== id));
-  };
 
   const clearCart = () => setCart([]);
 
-  const { total, count } = useMemo(() => {
-    const t = cart.reduce((sum, p) => sum + p.price * p.quantity, 0);
-    const c = cart.reduce((sum, p) => sum + p.quantity, 0);
-    return { total: t, count: c };
-  }, [cart]);
+  const cartCount = useMemo(
+    () => cart.reduce((acc, p) => acc + (p.qty ?? 1), 0),
+    [cart]
+  );
+  const cartTotal = useMemo(
+    () => cart.reduce((acc, p) => acc + (p.qty ?? 1) * Number(p.price || 0), 0),
+    [cart]
+  );
 
-  const value = {
-    cart,
-    addToCart,
-    changeQty,
-    removeFromCart,
-    clearCart,
-    total,
-    count,
-  };
+  const value = useMemo(
+    () => ({ cart, addToCart, inc, dec, removeFromCart, clearCart, cartCount, cartTotal }),
+    [cart, cartCount, cartTotal]
+  );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+}
+
+export function useCart() {
+  const ctx = useContext(CartContext);
+  if (!ctx) throw new Error("useCart debe usarse dentro de <CartProvider>");
+  return ctx;
 }
