@@ -6,28 +6,28 @@ export default function Navbar() {
   const { cart } = useCart();
   const { token, logout } = useUser();
 
-  const totalItems = cart.length;
-  const totalPrice = cart.reduce((sum, p) => sum + p.price, 0);
+  const totalItems = cart.reduce((sum, item) => sum + (item.qty ?? 1), 0);
+  const totalPrice = cart.reduce(
+    (sum, item) => sum + item.price * (item.qty ?? 1),
+    0
+  );
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm px-4 py-2">
       <div className="container-fluid d-flex justify-content-between align-items-center">
-        {/* Logo o Nombre */}
+        {/* Logo */}
         <Link to="/" className="navbar-brand fs-3 fw-bold text-danger">
           🍕 Pizzería Mamma Mía
         </Link>
 
         {/* Info del carrito */}
         <div className="d-flex align-items-center gap-3">
-          <Link
-            to="/cart"
-            className="badge bg-secondary px-3 py-2 fs-6 d-flex align-items-center gap-2 text-decoration-none"
-          >
-            <i className="bi bi-cart-fill"></i>
-            Total ({totalItems}) — ${Number(totalPrice || 0).toLocaleString("es-CL")}
+          <Link to="/cart" className="btn btn-outline-dark">
+            <i className="bi bi-cart-fill me-1"></i>
+            Total ({totalItems}) — ${totalPrice.toLocaleString("es-CL")}
           </Link>
 
-          {/* Botones dependiendo del token */}
+          {/* Botones según estado */}
           {token ? (
             <>
               <Link to="/profile" className="btn btn-outline-primary">
